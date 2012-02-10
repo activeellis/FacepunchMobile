@@ -1,7 +1,7 @@
 <?php 
 
 $domain =substr($_SERVER['PHP_SELF'],0,-9);
-function renewSession() {
+/*function renewSession() {
 	$field_strings = 'module=login&apikey=???&username=testaccount&password=testpassword';
 	$ch = curl_init();
 	curl_setopt($ch,CURLOPT_URL,'http://www.facepunch.com/fp_api.php');
@@ -29,7 +29,7 @@ function checkLogin() {
 	else {
 		renewSession();
 	}
-}
+}*/
 function getSession() {
 	return file_get_contents(session);
 }
@@ -48,7 +48,8 @@ function relogin($username,$password) {
 	setcookie('session',$array['sessionid']['s'],time()+60*30);
 }
 if (!ISSET($_COOKIE['loggedin'])) {
-checkLogin();
+//checkLogin();
+	echo '<a href="./?module=login">Please login</a>';
 }
 else {
 	if (ISSET($_COOKIE['logedin']) && !ISSET($_COOKIE['session'])) {
@@ -508,23 +509,14 @@ function pageCode($threadid,$pages) {
 			return (round($diff/$limit) == 1 ? ($case == "hour" ? "an" : "a") : round($diff/$limit))." ".$case.(round($diff/$limit) == 1 ? "" : "s")." ago";
 		}
 		}
-function requestArray($fields,$field_strings) {
-	$fields++;
-	$field_strings.= '&apikey=3hdia83jcm03halieb92';
-	if (!ISSET($_COOKIE['loggedin'])) {
-	$session = getSession();
-	$fields++;
-	$field_strings.= '&s='.$session;
-}
-else {
-	$session = $_COOKIE['session'];
-	$fields++;
-	$field_strings.='&s='.$session;
-}
+function requestArray($field_strings) {
+	if (ISSET($_COOKIE['loggedin'])) {
+		$username = $_COOKIE['username'];
+		$password = $_COOKIE['password'];
+		$field_strings.='&username='.$username."&password=".$password;
+	}
 	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,'http://www.facepunch.com/fp_api.php');
-	curl_setopt($ch,CURLOPT_POST,$fields);
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$field_strings);
+	curl_setopt($ch,CURLOPT_URL,'http://api.facepun.ch/?'.$field_strings);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 	$result = curl_exec($ch);
 	curl_close($ch);
@@ -532,16 +524,16 @@ else {
 }
 function fetchForum($type) {
 	$fields = 1;
-	$field_strings = 'module=forum';
+	$field_strings = 'action=';
 	if ($type == 1) {
-		$fields++;
-		$field_strings .= '&depth=5';
+		$field_strings .="getforums";
 	}
 	elseif ($type == 2) {
+		$field_strings .="getthreads";
 		$fields++;
-		$field_strings .= '&forumid='.$_GET["forumid"];
+		$field_strings .= '&forum_id='.$_GET["forumid"];
 	}
-	$array = requestArray($fields,$field_strings);
+	$array = requestArray($field_strings);
 	return $array;
 }
 function fetchThread($type) {
@@ -559,40 +551,46 @@ function fetchThread($type) {
 		$fields++;
 		$field_strings .= '&threadid='.$_GET["threadid"];
 	}
-	$array = requestArray($fields,$field_strings);
+	$array = requestArray($field_strings);
 	return $array;
 }
 function fetchPost() {
 	$fields = 3;
-	$field_strings = 'module=post&ratings=yes&threadid='.$_GET["threadid"];
+	$field_strings = 'action=getposts&thread_id='.$_GET["threadid"];
 	if (ISSET($_GET["page"])) {
 		$fields++;
 		$field_strings .= '&page='.$_GET["page"];
 	}
-	$array = requestArray($fields,$field_strings);
+	$array = requestArray($field_strings);
 	return $array;
 }
 function fetchPopular() {
 	$fields = 1;
-	$field_strings = 'module=popular';
-	$array = requestArray($fields,$field_strings);
+	$field_strings = 'action=getpopularthreads';
+	$array = requestArray($field_strings);
 	return $array;
 }
 function fetchRead() {
 	$fields = 1;
-	$field_strings = 'module=read';
-	$array=requestArray($fields,$field_strings);
+	$field_strings = 'action=getreadthreads';
+	$array=requestArray($field_strings);
 	return $array;
 }
 function getParent($forumid, $index, $returnid) {
-	foreach ($index['forums'] as $array) {
-		if ($array['forumid'] == $forumid) {
-			if (!in_array($returnid, array(0, 3, 398, 11, 197, 386, 348, 228, 392))) {
-				echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a>";
+	if (ISSET($index['forums'])) {
+		foreach ($index['forums'] as $array) {
+			if ($array['id'] == $forumid) {
+				if (!in_array($returnid, array(0, 3, 398, 11, 197, 386, 348, 228, 392))) {
+					echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a>";
+				}
+			}
+			elseif (ISSET($array['forums'])) {
+				getParent($forumid, $array, $array['id']);
 			}
 		}
-		elseif (ISSET($array['forums'])) {
-			getParent($forumid, $array, $array['forumid']);
+	} else {
+		foreach ($index['categories'] as $array) {
+			getParent($forumid, $array, "1");
 		}
 	}
 }
@@ -809,11 +807,11 @@ switch ($module) {
 			echo linkStuff("<div class=\"leftButton\">Re-login</div>",'?module=login');
 		}
 		echo "</div>";
-		foreach ($array['forums'] as $a) {
-			echo "<h1>".$a['title']."</h1>";
+		foreach ($array['categories'] as $a) {
+			echo "<h1>".$a['name']."</h1>";
 			$n = count($a['forums'])-1;
 			for ($i=0;$i<=$n;$i++) {
-				echo '<a href="?module=thread&forumid='.$a['forums'][$i]['forumid'].'"><div '.(ISSET($_COOKIE['forumicons'])?'':'style="background-position:6px center;background-repeat: no-repeat;background-image:url('.$domain.'forumicons/'.$a['forums'][$i]['forumid'].'.png)"').' id="forumContainer"><div '.(ISSET($_COOKIE['forumicons'])?'style="padding-left:0px!important;"':'').' id="forumTitleContainer">'.$a['forums'][$i]['title'].'</div></div></a>';
+				echo '<a href="?module=thread&forumid='.$a['forums'][$i]['id'].'"><div '.(ISSET($_COOKIE['forumicons'])?'':'style="background-position:6px center;background-repeat: no-repeat;background-image:url('.$domain.'forumicons/'.$a['forums'][$i]['id'].'.png)"').' id="forumContainer"><div '.(ISSET($_COOKIE['forumicons'])?'style="padding-left:0px!important;"':'').' id="forumTitleContainer">'.$a['forums'][$i]['name'].'</div></div></a>';
 				if ($i<$n) {
 					echo "<div id=\"er\"></div>";
 				}
@@ -832,7 +830,7 @@ switch ($module) {
 	echo "<div id=\"forumWrapper\">";
 	echo "<div id=\"forumHeader\">".linkStuff("<div class=\"leftButton\">Home</div>",$domain);
 	echo linkStuff("<div class=\"leftButton\">Popular</div>",'?module=popular');
-	echo getParent($arrayforum['forums'][0]['forumid'],$index,0);
+	echo getParent($_GET["forumid"],$index,0);
 	if ((!EMPTY($arrayforum['forums'][0]['forums'])) && $arrayforum['forums'][0]['forumid'] != 345) {
 		if (!ISSET($_COOKIE[$arrayforum['forums'][0]['forumid']])) {
 			echo "<a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"minus\" class=\"rightButton\" style=\"display: block; \">Collapse</div></a><a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"plus\" class=\"rightButton\" style=\"display: none; \">Expand</div></a>";
@@ -842,9 +840,9 @@ switch ($module) {
 		}
 	}
 	if (ISSET($_COOKIE['loggedin'])) {
-			echo linkStuff("<div class=\"leftButton\">Read</div>",'?module=read');
-		}
-	echo "</div>".tagStuff(tagStuff($arrayforum['forums'][0]['title'],"center"),"h1");
+		echo linkStuff("<div class=\"leftButton\">Read</div>",'?module=read');
+	}
+	echo "</div>".tagStuff(tagStuff("TODO: title","center"),"h1");
 	if (ISSET($arrayforum['forums'][0]['forums'])) {
 		if (!ISSET($_COOKIE[$arrayforum['forums'][0]['forumid']])) {
 			echo "<div id=\"cat\">";
@@ -858,28 +856,28 @@ switch ($module) {
 		}
 		echo "</div>";
 	}
-	$pagecode = getForumPageCode($array['stats']['totalpages']);
+	$pagecode = getForumPageCode($arrayforum['numpages']);
 	echo $pagecode;
 	echo '<div style="display:block;height: 1px;width: 100%;background: #999;"></div>';
 	
-	if (!EMPTY($array['threads'])) {
+	if (!EMPTY($arrayforum['threads'])) {
 		echo "<div id=\"content\">";
-		foreach ($array['threads'] as $a) {
+		foreach ($arrayforum['threads'] as $a) {
 			/*echo "<div id=\"thread\"><div id=\"normal\"><a href =\"?module=post&threadid=".$a['threadid']."\"><span id=\"hover\"><h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2><h3><b>".$a['username']."</b> ".$a['replycount']." repl".($a['replycount']==1 ? "y" : "ies")."</h3></span></a></div><a href=\"?module=post&threadid=".$a['threadid']."&page=".$a['pages']."\"><div id=\"last\">>></div></a></div><div id=\"er\"></div>";
 			*/
 			echo "<div id=\"thread\">
-			<a href =\"?module=post&threadid=".$a['threadid']."\">
+			<a href =\"?module=post&threadid=".$a['id']."\">
 			<div id=\"title\">
 			<h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2>";
 			echo "</div>
 			</a>";
 			if($a['pages']>1){
-				$threadpagecode = pageCode($a['threadid'],$a['pages']);
+				$threadpagecode = pageCode($a['id'],$a['pages']);
 				echo '<div id="threadPagecode">( ';
 				echo $threadpagecode;
 				echo ' )</div>';
 			}			
-			echo "<div id=\"info\"><h3><b>".$a['username']."</b> ".$a['replycount']." repl".(intval(str_replace(",","",$a['replycount']))==1 ? "y" : "ies")."<span style=\"float:right;\">".getTime($a['lastpost'])." by ".$a['lastposter']."</span></h3>
+			echo "<div id=\"info\"><h3><b>".$a['author']."</b> ".$a['replies']." repl".(intval(str_replace(",","",$a['replies']))==1 ? "y" : "ies")."<span style=\"float:right;\">".$a['lastposttime']." by ".$a['lastpostauthorname']."</span></h3>
 			</div>
 			</div>";
 			echo '<div style="display:block;height: 1px;width: 100%;background: #999;"></div>';
@@ -891,8 +889,7 @@ switch ($module) {
 	break;
 	case "post":
 	require_once('nbbc.php');
-	$arraythread = fetchThread(2);
-	$returnid = $arraythread['threads'][0]['forumid'];
+	$returnid = 6; //todo: add this to GET request so.
 	if ($returnid == 56) {
 		echo 'what you are doing is highly illegal';
 		break;
@@ -900,43 +897,17 @@ switch ($module) {
 	echo "<div id=\"threadWrapper\"><div id=\"threadHeader\">".linkStuff("<div class=\"leftButton\">Home</div>",$domain);
 	echo linkStuff("<div class=\"leftButton\">Popular</div>",'?module=popular');
 	echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a></div>";
-	echo tagStuff(tagStuff($arraythread['threads'][0]['title'],"center"),"h1");
-	$pagecode = getThreadPageCode($arraythread['threads'][0]['pages']);
+	echo tagStuff(tagStuff($array['title'],"center"),"h1");
+	$pagecode = getThreadPageCode($array['numpages']);
 	echo $pagecode;
 	$oddeven = 1;
 	$wut= 0;
 	foreach ($array['posts'] as $thread) {
 		if(!EMPTY($pagecode) || $wut == 1) {
-		echo '<div id="er"></div>';
-	}
-	$wut = 1;
-		$diff = time() - $thread['dateline'];
-		switch ($diff) {
-			case ($diff<60):
-			$limit = 1;
-			$case = "second";
-			break;
-			case ($diff<3600):
-			$limit = 60;
-			$case = "minute";
-			break;
-			case ($diff<86400):
-			$limit = 3600;
-			$case = "hour";
-			break;
-			case ($diff<604800):
-			$limit = 86400;
-			$case = "day";
-			break;
-			default:
-			$case = "normal";
+			echo '<div id="er"></div>';
 		}
-		if ($case == "normal") {
-			$datetext = date('jS F Y',$thread['dateline']);
-		}
-		else {
-			$datetext = (round($diff/$limit) == 1 ? ($case == "hour" ? "an" : "a") : round($diff/$limit))." ".$case.(round($diff/$limit) == 1 ? "" : "s")." ago";
-		}
+		$wut = 1;
+		$datetext = $thread["time"];
 		echo "<div class=\"";
 		if ($oddeven == 1) {
 			echo "oddpost";
@@ -946,7 +917,7 @@ switch ($module) {
 			echo "evenpost";
 			$oddeven = 1;
 		}
-		echo "\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/".$thread['avatarurl'].");\"").">".($thread['displaygroupid']=='16'?'<font color="#A06000">':($thread['displaygroupid']=='8'?'<font color="red">':($thread['displaygroupid']=='5'?'<font color="#0A0">':'<font color="#147">'))).$thread['username'].($thread['displaygroupid']=='16'?'</font>':($thread['displaygroupid']=='8'?'</font>':($thread['displaygroupid']=='5'?'</font>':'</font>')))."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($thread['usertitle'])?optimizeUserTitleSize($thread['usertitle']):'')."</div></h4><h5>";
+		echo "\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/avatar/".$thread["userid"].".png);\"").">".$thread['username']."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($thread['usertitle'])?optimizeUserTitleSize($thread['usertitle']):'')."</div></h4><h5>";
 		$bbcode = new BBCode;
 		if (ISSET($_COOKIE['images'])) {
 			$bbcode->RemoveRule('img');
@@ -972,7 +943,7 @@ switch ($module) {
 		if (ISSET($thread['ratings']) && !ISSET($_COOKIE['ratings'])) {
 			echo "<div id=\"ratingWrapper\"><div id=\"ratings\">";
 			foreach ($thread['ratings'] as $r => $b) {
-				echo "<img src=\"http://www.eewai.com/facepunch/ratings/".$ratings[$r].".png\" />x".$b;
+				echo "<img src=\"./ratings/".$r.".png\" />x".$b;
 			}
 			echo "</div></div>";
 		}
@@ -985,7 +956,7 @@ switch ($module) {
 	if (ISSET($_COOKIE['loggedin'])) {
 		echo '<form id="reply" action="reply.php" method="post" accept-charset="UTF-8">
 		<input type="hidden" name="threadid" value="'.$_GET['threadid'].'"></input>
-		<input type="hidden" name="page" value="'.$_GET['page'].'"></input>
+		<input type="hidden" name="page" value="'.(ISSET($_GET['page']) ? $_GET['page'] : 1).'"></input>
 		<textarea type="text" name="message" size="10" required></textarea>
 		<input type="submit" value="Reply" name="reply" class="reply" />
 		</form>';
@@ -1023,18 +994,18 @@ switch ($module) {
 		echo "<div id=\"content\">";
 		foreach ($array['threads'] as $a) {
 			echo "<div id=\"thread\">
-			<a href =\"?module=post&threadid=".$a['threadid']."\">
+			<a href =\"?module=post&threadid=".$a['id']."\">
 			<div id=\"title\">
 			<h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2>";
 			echo "</div>
 			</a>";
 			if($a['pages']>1){
-				$threadpagecode = pageCode($a['threadid'],$a['pages']);
+				$threadpagecode = pageCode($a['id'],$a['pages']);
 				echo '<div id="threadPagecode">( ';
 				echo $threadpagecode;
 				echo ' )</div>';
 			}			
-			echo "<div id=\"info\"><h3><b>".$a['username']."</b> ".$a['replycount']." repl".(intval(str_replace(",","",$a['replycount']))==1 ? "y" : "ies").' '.$a['viewers']." viewing</h3>
+			echo "<div id=\"info\"><h3><b>".$a['author']."</b> ".$a['replies']." repl".(intval(str_replace(",","",$a['replies']))==1 ? "y" : "ies").' '.$a['reading']." viewing</h3>
 			</div>
 			</div>";
 			echo '<div style="display:block;height: 1px;width: 100%;background: #999;"></div>';
@@ -1048,18 +1019,18 @@ switch ($module) {
 		echo "<div id=\"content\">";
 		foreach ($array['threads'] as $a) {
 			echo "<div id=\"thread\">
-			<a href =\"?module=post&threadid=".$a['threadid']."\">
+			<a href =\"?module=post&threadid=".$a['id']."\">
 			<div id=\"title\">
 			<h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2>";
 			echo "</div>
 			</a>";
 			if($a['pages']>1){
-				$threadpagecode = pageCode($a['threadid'],$a['pages']);
+				$threadpagecode = pageCode($a['id'],$a['pages']);
 				echo '<div id="threadPagecode">( ';
 				echo $threadpagecode;
 				echo ' )</div>';
 			}			
-			echo "<div id=\"info\"><h3><b>".$a['username']."</b> ".$a['replycount']." repl".(intval(str_replace(",","",$a['replycount']))==1 ? "y" : "ies").' '.$a['viewers']." viewing</h3>
+			echo "<div id=\"info\"><h3><b>".$a['author']."</b> ".$a['replies']." repl".(intval(str_replace(",","",$a['replies']))==1 ? "y" : "ies").' '.$a['reading']." viewing</h3>
 			</div>
 			</div>";
 			echo '<div style="display:block;height: 1px;width: 100%;background: #999;"></div>';
