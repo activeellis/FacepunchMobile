@@ -1,54 +1,7 @@
 <?php 
-
 $domain =substr($_SERVER['PHP_SELF'],0,-9);
-/*function renewSession() {
-	$field_strings = 'module=login&apikey=???&username=testaccount&password=testpassword';
-	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,'http://www.facepunch.com/fp_api.php');
-	curl_setopt($ch,CURLOPT_POST,'4');
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$field_strings);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-	$result = curl_exec($ch);
-	curl_close($ch);
-	$return = json_decode($result, true);
-	if (ISSET($return['sessionid'])) {
-		file_put_contents(time, time());
-		file_put_contents(session, $return['sessionid']);
-	}
-}
-function checkLogin() {
-	if((file_exists(time))&&(file_exists(session))) {
-		$time = file_get_contents(time);
-		if ((time()-$time)>300) {
-			renewSession();
-		}
-		else {
-			$session = file_get_contents(session);
-		}
-	}
-	else {
-		renewSession();
-	}
-}*/
-function getSession() {
-	return file_get_contents(session);
-}
-function relogin($username,$password) {
-	$field_strings = 'module=login&username='.$username.'&password='.$password;
-	$field_strings.= '&apikey=???';
-	$fields = 4;
-	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,'http://www.facepunch.com/fp_api.php');
-	curl_setopt($ch,CURLOPT_POST,$fields);
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$field_strings);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-	$result = curl_exec($ch);
-	curl_close($ch);
-	$array = json_decode($result,true);
-	setcookie('session',$array['sessionid']['s'],time()+60*30);
-}
+
 if (!ISSET($_COOKIE['loggedin']) && (ISSET($_GET['module']) ? $_GET['module'] != "login" : true)) {
-//checkLogin();
 	die('<a href="./?module=login">Please login</a>');
 }
 else {
@@ -56,30 +9,6 @@ else {
 		relogin($_COOKIE['username'],$_COOKIE['password']);
 	} 
 }
-/*
-function autoLogin($username,$password) {
-	$field_strings = 'module=login&apikey=???&username='.$username.'&password_md5='.$password;
-	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,'http://www.facepunch.com/fp_api.php');
-	curl_setopt($ch,CURLOPT_POST,'4');
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$field_strings);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
-	$result = curl_exec($ch);
-	curl_close($ch);
-	$return = json_decode($result, true);
-		if (ISSET($return['sessionid'])) {
-			session_start();
-			$_SESSION['reloggedin'] = true;
-			$_SESSION['newsession'] = $return['sessionid']['s'];
-			setcookie("session",$return['sessionid']['s'],time()+60*10,'/facepunch/');
-			setcookie("username",$username,time()+60*60*24*365,'/facepunch/');				
-			setcookie("password",$password,time()+60*60*24*365,'/facepunch/');
-		}
-}
-if (!ISSET($_COOKIE["session"]) && ISSET($_COOKIE["username"])) {
-	autoLogin($_COOKIE["username"],$_COOKIE["password"]);
-}
-*/
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -462,16 +391,16 @@ function pageCode($threadid,$pages) {
 				if($pages<=9){
 					$threadpagecode = '';
 					for($i=2;$i<=$pages;$i++) {
-						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'">'.$i.($i==$pages?' Last':'').'</a>';
+						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'&forumid='.$_GET['forumid'].'">'.$i.($i==$pages?' Last':'').'</a>';
 						if ($i != $pages) {
 							$threadpagecode .= ' ';
 						}
 					}
 				}
 				if ($pages > 9) {
-					$threadpagecode='<a href="?module=post&threadid='.$threadid.'&page=2">2</a> <a href="?module=post&threadid='.$threadid.'&page=3">3</a> <a href="?module=post&threadid='.$threadid.'&page=4">4</a> <a href="?module=post&threadid='.$threadid.'&page=5">5</a> .. ';
+					$threadpagecode='<a href="?module=post&threadid='.$threadid.'&page=2">2</a> <a href="?module=post&threadid='.$threadid.'&page=3&forumid='.$_GET['forumid'].'">3</a> <a href="?module=post&threadid='.$threadid.'&page=4&forumid='.$_GET['forumid'].'">4</a> <a href="?module=post&threadid='.$threadid.'&page=5&forumid='.$_GET['forumid'].'">5</a> .. ';
 					for ($i=$pages-3;$i<=$pages;$i++) {
-						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'">'.$i.($i==$pages?' Last':'').'</a>';
+						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'&forumid='.$_GET['forumid'].'">'.$i.($i==$pages?' Last':'').'</a>';
 						if ($i != $pages) {
 							$threadpagecode .= ' ';
 						}
