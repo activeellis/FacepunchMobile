@@ -33,11 +33,8 @@ function Login() {
 		setcookie('password',$password,time()+60*60*24*365);
 		ob_end_flush();
 	}
-	elseif (ISSET($array['error'])) {
-		echo $array['error']['message'];
+	else {
 		echo '<br /><a href="http://eewai.com/facepunch/?module=login">Try again?</a>';
-	} else {
-		print_r($array);
 	}
 }
 Login();

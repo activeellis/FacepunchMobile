@@ -47,9 +47,9 @@ function relogin($username,$password) {
 	$array = json_decode($result,true);
 	setcookie('session',$array['sessionid']['s'],time()+60*30);
 }
-if (!ISSET($_COOKIE['loggedin'])) {
+if (!ISSET($_COOKIE['loggedin']) && $_GET['module'] != "login") {
 //checkLogin();
-	echo '<a href="./?module=login">Please login</a>';
+	die('<a href="./?module=login">Please login</a>');
 }
 else {
 	if (ISSET($_COOKIE['logedin']) && !ISSET($_COOKIE['session'])) {
@@ -582,6 +582,8 @@ function getParent($forumid, $index, $returnid) {
 			if ($array['id'] == $forumid) {
 				if (!in_array($returnid, array(0, 3, 398, 11, 197, 386, 348, 228, 392))) {
 					echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a>";
+				} else if ($returnid == 0) {
+					echo "<a href=\"?module=forum\"><div class=\"rightButton\">Back</div></a>";
 				}
 			}
 			elseif (ISSET($array['forums'])) {
@@ -590,7 +592,23 @@ function getParent($forumid, $index, $returnid) {
 		}
 	} else {
 		foreach ($index['categories'] as $array) {
-			getParent($forumid, $array, "1");
+			getParent($forumid, $array, 0);
+		}
+	}
+}
+function getForumName($forumid, $index) {
+	if (ISSET($index['forums'])) {
+		foreach ($index['forums'] as $array) {
+			if ($array['id'] == $forumid) {
+				return $array['name'];
+			}
+			elseif (ISSET($array['forums'])) {
+				return getForumName($forumid, $array);
+			}
+		}
+	} else {
+		foreach ($index['categories'] as $array) {
+			return getForumName($forumid, $array);
 		}
 	}
 }
@@ -842,7 +860,7 @@ switch ($module) {
 	if (ISSET($_COOKIE['loggedin'])) {
 		echo linkStuff("<div class=\"leftButton\">Read</div>",'?module=read');
 	}
-	echo "</div>".tagStuff(tagStuff("TODO: title","center"),"h1");
+	echo "</div>".tagStuff(tagStuff(getForumName($_GET['forumid'], $index),"center"),"h1");
 	if (ISSET($arrayforum['forums'][0]['forums'])) {
 		if (!ISSET($_COOKIE[$arrayforum['forums'][0]['forumid']])) {
 			echo "<div id=\"cat\">";
@@ -1040,7 +1058,7 @@ switch ($module) {
 	break;
 	case "login":
 	echo "<div id=\"indexWrapper\">";
-		echo "<div id=\"indexHeader\">".linkStuff("<div class=\"rightButton\">Settings</div>",'?module=settings').linkStuff("<div class=\"rightButton\">Logout</div>",'logout.php');;
+		echo "<div id=\"indexHeader\">".linkStuff("<div class=\"rightButton\">Settings</div>",'?module=settings').(ISSET($_COOKIES['loggedin']) ? linkStuff("<div class=\"rightButton\">Logout</div>",'logout.php') : "");
 
 		echo linkStuff("<div class=\"rightButton\">Popular</div>",'?module=popular');
 		echo linkStuff("<div class=\"leftButton\">Home</div></div>",$domain);
