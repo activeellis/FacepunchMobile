@@ -703,7 +703,7 @@ function getThreadPageCode($pagenumber) {
 				$pagecode .= '<b>'.$i.'</b>';
 			}
 			else {
-				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i);
+				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i."&forumid=".$_GET['forumid']);
 			}
 			if ($i < $limit) {
 				$pagecode .= ' ';
@@ -711,13 +711,13 @@ function getThreadPageCode($pagenumber) {
 
 		}
 		if ($pagenumber > 10) {
-			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber);
+			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber."&forumid=".$_GET['forumid']);
 		}
 		$pagecode .= '</center></div>';
 	}
 	elseif ($currentpage >= 99) {
 		$pagecode = '<div id="page"><center>';
-		$pagecode .= linkStuff('First',"?module=post&threadid=".$currentthread."&page=1").' ';
+		$pagecode .= linkStuff('First',"?module=post&threadid=".$currentthread."&page=1"."&forumid=".$_GET['forumid']).' ';
 		for ($i=$currentpage-2;$i<=$currentpage+2;$i++) {
 			if ($pagenumber == $i) {
 				break;
@@ -726,14 +726,14 @@ function getThreadPageCode($pagenumber) {
 				$pagecode .= '<b>'.$i.'</b>';
 			}
 			else {
-				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i);
+				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i."&forumid=".$_GET['forumid']);
 			}
 			if ($i < $currentpage+2) {
 				$pagecode .= ' ';
 			}
 		}
 		if ($currentpage != $pagenumber) {
-			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber);
+			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber."&forumid=".$_GET['forumid']);
 		}
 		elseif ($currentpage == $pagenumber) {
 			$pagecode .= ' <b>'.$currentpage.'</b>';
@@ -742,7 +742,7 @@ function getThreadPageCode($pagenumber) {
 	}
 	else {
 		$pagecode = '<div id="page"><center>';
-		$pagecode .= linkStuff('First',"?module=post&threadid=".$currentthread."&page=1").' ';
+		$pagecode .= linkStuff('First',"?module=post&threadid=".$currentthread."&page=1"."&forumid=".$_GET['forumid']).' ';
 		for ($i=$currentpage-3;$i<=$currentpage+3;$i++) {
 			if ($pagenumber == $i) {
 				break;
@@ -751,14 +751,14 @@ function getThreadPageCode($pagenumber) {
 				$pagecode .= '<b>'.$i.'</b>';
 			}
 			else {
-				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i);
+				$pagecode .= linkStuff($i,"?module=post&threadid=".$currentthread."&page=".$i."&forumid=".$_GET['forumid']);
 			}
 			if ($i < $currentpage+3) {
 				$pagecode .= ' ';
 			}
 		}
 		if ($currentpage != $pagenumber) {
-			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber);
+			$pagecode .= ' '.linkStuff('Last',"?module=post&threadid=".$currentthread."&page=".$pagenumber."&forumid=".$_GET['forumid']);
 		}
 		elseif ($currentpage == $pagenumber) {
 			$pagecode .= ' <b>'.$currentpage.'</b>';
@@ -884,7 +884,7 @@ switch ($module) {
 			/*echo "<div id=\"thread\"><div id=\"normal\"><a href =\"?module=post&threadid=".$a['threadid']."\"><span id=\"hover\"><h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2><h3><b>".$a['username']."</b> ".$a['replycount']." repl".($a['replycount']==1 ? "y" : "ies")."</h3></span></a></div><a href=\"?module=post&threadid=".$a['threadid']."&page=".$a['pages']."\"><div id=\"last\">>></div></a></div><div id=\"er\"></div>";
 			*/
 			echo "<div id=\"thread\">
-			<a href =\"?module=post&threadid=".$a['id']."\">
+			<a href =\"?module=post&threadid=".$a['id']."&forumid=".$_GET['forumid']."\">
 			<div id=\"title\">
 			<h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2>";
 			echo "</div>
@@ -907,7 +907,7 @@ switch ($module) {
 	break;
 	case "post":
 	require_once('nbbc.php');
-	$returnid = 6; //todo: add this to GET request so.
+	$returnid = $_GET['forumid']; //todo: add this to GET request so.
 	if ($returnid == 56) {
 		echo 'what you are doing is highly illegal';
 		break;
