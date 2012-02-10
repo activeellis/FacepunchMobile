@@ -47,7 +47,7 @@ function relogin($username,$password) {
 	$array = json_decode($result,true);
 	setcookie('session',$array['sessionid']['s'],time()+60*30);
 }
-if (!ISSET($_COOKIE['loggedin']) && $_GET['module'] != "login") {
+if (!ISSET($_COOKIE['loggedin']) && (ISSET($_GET['module']) ? $_GET['module'] != "login" : true)) {
 //checkLogin();
 	die('<a href="./?module=login">Please login</a>');
 }

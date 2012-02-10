@@ -26,7 +26,7 @@ function Login() {
 		
 		echo '<html><head><meta http-equiv="refresh" content="5; URL=./index.php"></head><body>';
 		echo 'Welcome '.$username;
-		echo '<br />You will be redirected in 5 seconds or <a href="http://eewai.com/facepunch">click here</a>';
+		echo '<br />You will be redirected in 5 seconds or <a href="./index.php">click here</a>';
 		echo '</body></html>';
 		setcookie('loggedin',1,time()+60*60*24*365);
 		setcookie('username',$username,time()+60*60*24*365);
@@ -34,7 +34,7 @@ function Login() {
 		ob_end_flush();
 	}
 	else {
-		echo '<br /><a href="http://eewai.com/facepunch/?module=login">Try again?</a>';
+		echo '<br /><a href="./?module=login">Try again?</a>';
 	}
 }
 Login();
