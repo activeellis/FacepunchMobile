@@ -1,9 +1,10 @@
 <?php
 function sendArray($field_strings) {
 	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL,'http://api.facepun.ch/?');
-	curl_setopt($ch,CURLOPT_POST,$fields);
-	curl_setopt($ch,CURLOPT_POSTFIELDS,$field_strings);
+	$username = $_COOKIE['username'];
+	$password = $_COOKIE['password'];
+	$field_strings.='&username='.$username."&password=".$password;
+	curl_setopt($ch,CURLOPT_URL,'http://api.facepun.ch/?'.$field_strings);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 	$result = curl_exec($ch);
 	curl_close($ch);
