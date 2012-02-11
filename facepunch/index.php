@@ -836,14 +836,17 @@ switch ($module) {
 	break;
 	case "post":
 	require_once('nbbc.php');
-	$returnid = $_GET['forumid']; //todo: add this to GET request so.
+	$returnid = isset($_GET['forumid']) ? $_GET['forumid'] : 0; //todo: add this to GET request so.
 	if ($returnid == 56) {
 		echo 'what you are doing is highly illegal';
 		break;
 	}
 	echo "<div id=\"threadWrapper\"><div id=\"threadHeader\">".linkStuff("<div class=\"leftButton\">Home</div>",$domain);
 	echo linkStuff("<div class=\"leftButton\">Popular</div>",'?module=popular');
-	echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a></div>";
+	if ($returnid != 0)
+		echo "<a href=\"?module=thread&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a></div>";
+	else
+		echo "<a href=\"?module=forum\"><div class=\"rightButton\">Back</div></a></div>";
 	echo tagStuff(tagStuff($array['title'],"center"),"h1");
 	$pagecode = getThreadPageCode($array['numpages']);
 	echo $pagecode;
