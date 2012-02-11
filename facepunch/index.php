@@ -387,28 +387,28 @@ a, a:link, a:visited, a:active, a:hover {
 <body>
 <?php
 		$ratings = array(1=>"tick",2=>"cross",3=>"funny2",4=>"information",5=>"heart",6=>"wrench",7=>"rainbow",8=>"palette",9=>"clock",10=>"spellcheck",11=>"book_error",12=>"box",13=>"zing",14=>"programming_king",15=>"weed",16=>"lua_king",17=>"mapping_king",18=>"winner",19=>"lua_helper",20=>"nipple",21=>"moustache");
-function pageCode($threadid,$pages) {
-				if($pages<=9){
-					$threadpagecode = '';
-					for($i=2;$i<=$pages;$i++) {
-						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'&forumid='.$_GET['forumid'].'">'.$i.($i==$pages?' Last':'').'</a>';
-						if ($i != $pages) {
-							$threadpagecode .= ' ';
-						}
+		function pageCode($threadid,$pages) {
+			if($pages<=9){
+				$threadpagecode = '';
+				for($i=2;$i<=$pages;$i++) {
+					$threadpagecode .= '<a href="?action=thread&threadid='.$threadid.'&page='.$i.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">'.$i.($i==$pages?' Last':'').'</a>';
+					if ($i != $pages) {
+						$threadpagecode .= ' ';
 					}
 				}
-				if ($pages > 9) {
-					$threadpagecode='<a href="?module=post&threadid='.$threadid.'&page=2">2</a> <a href="?module=post&threadid='.$threadid.'&page=3&forumid='.$_GET['forumid'].'">3</a> <a href="?module=post&threadid='.$threadid.'&page=4&forumid='.$_GET['forumid'].'">4</a> <a href="?module=post&threadid='.$threadid.'&page=5&forumid='.$_GET['forumid'].'">5</a> .. ';
-					for ($i=$pages-3;$i<=$pages;$i++) {
-						$threadpagecode .= '<a href="?module=post&threadid='.$threadid.'&page='.$i.'&forumid='.$_GET['forumid'].'">'.$i.($i==$pages?' Last':'').'</a>';
-						if ($i != $pages) {
-							$threadpagecode .= ' ';
-						}
-					}
-
-				}
-				return $threadpagecode;
 			}
+			if ($pages > 9) {
+				$threadpagecode='<a href="?action=thread&threadid='.$threadid.'&page=2">2</a> <a href="?action=thread&threadid='.$threadid.'&page=3'.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">3</a> <a href="?action=thread&threadid='.$threadid.'&page=4'.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">4</a> <a href="?action=thread&threadid='.$threadid.'&page=5'.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">5</a> .. ';
+				for ($i=$pages-3;$i<=$pages;$i++) {
+					$threadpagecode .= '<a href="?action=thread&threadid='.$threadid.'&page='.$i.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">'.$i.($i==$pages?' Last':'').'</a>';
+					if ($i != $pages) {
+						$threadpagecode .= ' ';
+					}
+				}
+
+			}
+			return $threadpagecode;
+		}
 		function getTime($dateline) {
 				$diff = time() - $dateline;
 		switch ($diff) {
