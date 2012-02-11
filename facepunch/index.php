@@ -15,7 +15,9 @@ $actions = array(
 	"read" => "readpopular.php",
 	"popular" => "readpopular.php",
 	"settings" => "settings.php",
-	"reply" => "reply.php");
+	"reply" => "reply.php",
+	"privatemessages" => "privatemessaging.php",
+	"viewpm" => "privatemessaging.php");
 
 if (!isset($actions[$action]))
 	$action = "frontpage";

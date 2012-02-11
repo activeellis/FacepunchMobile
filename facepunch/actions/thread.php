@@ -12,13 +12,12 @@ if ($returnid == 56) {
 	echo 'what you are doing is highly illegal';
 	break;
 }
-echo "<div id=\"threadWrapper\"><div id=\"threadHeader\">".linkStuff("<div class=\"leftButton\">Home</div>","./?action=frontpage");
-echo linkStuff("<div class=\"leftButton\">Popular</div>",'?action=popular');
-if ($returnid != 0)
-	echo "<a href=\"?action=forum&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a></div>";
-else
-	echo "<a href=\"?action=frontpage\"><div class=\"rightButton\">Back</div></a></div>";
-echo tagStuff(tagStuff($array['title'],"center"),"h1");
+
+topBar($array['title'], array(
+		array("left", "?action=frontpage", "Home"),
+		array("left", "?action=popular", "Popular"),
+		array("right", $returnid != 0 ? "?action=forum&forumid=".$returnid : "?action=frontpage", "Back")));
+
 $pagecode = getThreadPageCode($array['numpages']);
 echo $pagecode;
 $oddeven = false;

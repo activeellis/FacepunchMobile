@@ -400,20 +400,25 @@ function getParent($forumid, $index, $returnid) {
 		foreach ($index['forums'] as $array) {
 			if ($array['id'] == $forumid) {
 				if (!in_array($returnid, array(0, 3, 398, 11, 197, 386, 348, 228, 392))) {
-					echo "<a href=\"?action=forum&forumid=".$returnid."\"><div class=\"rightButton\">Back</div></a>";
+					return $returnid;
 				} else if ($returnid == 0) {
-					echo "<a href=\"?action=frontpage\"><div class=\"rightButton\">Back</div></a>";
+					return 0;
 				}
 			}
 			elseif (ISSET($array['forums'])) {
-				getParent($forumid, $array, $array['id']);
+				$toret = getParent($forumid, $array, $array['id']);
+				if ($toret != 0)
+					return $toret;
 			}
 		}
 	} else {
 		foreach ($index['categories'] as $array) {
-			getParent($forumid, $array, 0);
+			$toret = getParent($forumid, $array, 0);
+			if ($toret != 0)
+				return $toret;
 		}
 	}
+	return 0;
 }
 
 function getForumName($forumid, $index) {
@@ -645,6 +650,25 @@ function pageCode($threadid,$pages) {
 
 	}
 	return $threadpagecode;
+}
+
+function topBar($title, $actions) {
+	?>
+<div id="indexWrapper">
+<div id="indexHeader">
+<?php
+	foreach ($actions as $action) {
+		if ($action[0] == "left")
+			echo '<a href="'.$action[1].'"><div class="leftButton">'.$action[2].'</div></a>';
+		else
+			echo '<a href="'.$action[1].'"><div class="rightButton">'.$action[2].'</div></a>';
+	}
+?>
+</div>
+	<?php if ($title != null) { ?>
+<center><h1><?=$title?></h1></center>
+	<?php
+	}
 }
 
 ?>

@@ -4,16 +4,11 @@ if (!defined('fp'))
 
 if (!isset($_POST['username'])) {
 	forumHeader();
+	
+	topBar("Login", array(
+		array("left", "?action=frontpage", "Home"),
+		array("right", "?action=settings", "Settings")));
 ?>
-<div id="indexWrapper">
-<div id="indexHeader">
-<a href="?action=settings"><div class="rightButton">Settings</div></a>
-<?php
-echo (ISSET($_COOKIES['loggedin']) ? linkStuff("<div class=\"rightButton\">Logout</div>",'?action=logout') : "");
-?>
-<a href="?action=popular"><div class="rightButton">Popular</div></a>
-<a href="?action=frontpage"><div class="leftButton">Home</div></div></a>
-</div>
 <form id="login" action="?action=login" method="post" accept-charset="UTF-8">
 <label>Username:</label>
 <input type="text" name="username" />

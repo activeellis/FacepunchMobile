@@ -4,6 +4,10 @@ if (!defined('fp'))
 
 forumHeader();
 
+topBar('Replied!', array(
+		array("left", "?action=frontpage", "Home"),
+		array("right", "?action=settings", "Settings")));
+
 if (isset($_POST['message']) && isset($_POST['threadid'])) {
 	$message = $_POST['message'];
 	$threadid = $_POST['threadid'];

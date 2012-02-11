@@ -6,17 +6,13 @@ forumHeader();
 
 $categories = $api->getForums();
 
-echo "<div id=\"indexWrapper\">";
-echo "<div id=\"indexHeader\">".linkStuff("<div class=\"rightButton\">Settings</div>",'?action=settings');
-echo linkStuff("<div class=\"rightButton\">Popular</div>",'?action=popular');
-if (!ISSET($_COOKIE['loggedin'])) {
-	echo linkStuff("<div class=\"leftButton\">Login</div>",'?action=login');
-}
-elseif (ISSET($_COOKIE['loggedin'])) {
-	echo linkStuff("<div class=\"leftButton\">Read</div>",'?action=read');
-	echo linkStuff("<div class=\"leftButton\">Re-login</div>",'?action=login');
-}
-echo "</div>";
+topBar(null, array(
+	array("left", "?action=read", "Read"),
+	array("left", "?action=login", "Re-login"),
+	array("right", "?action=settings", "Settings"),
+	array("right", "?action=popular", "Popular"),
+	array("right", "?action=privatemessages", "<img src='pm.png'\>")));
+
 foreach ($categories['categories'] as $a) {
 	echo "<h1>".$a['name']."</h1>";
 	$n = count($a['forums'])-1;

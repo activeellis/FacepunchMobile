@@ -12,19 +12,22 @@ $arrayforum = $result[0];
 $pages = $result[1];
 
 echo "<div id=\"forumWrapper\">";
-echo "<div id=\"forumHeader\">".linkStuff("<div class=\"leftButton\">Home</div>","./?action=frontpage");
-echo linkStuff("<div class=\"leftButton\">Popular</div>",'?action=popular');
-echo getParent($_GET["forumid"],$index,0);
-if (!EMPTY($subforums) && $_GET['forumid'] != 345) {
+$returnid = getParent($_GET["forumid"],$index,0);
+
+
+if (!EMPTY($subforums) && $_GET['forumid'] != 345) { 
 	if (!ISSET($_COOKIE[$_GET['forumid']])) {
 		echo "<a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"minus\" class=\"rightButton\" style=\"display: block; \">Collapse</div></a><a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"plus\" class=\"rightButton\" style=\"display: none; \">Expand</div></a>";
 	} else {
 		echo "<a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"minus\" class=\"rightButton\" style=\"display: none; \">Collapse</div></a><a href=\"javascript:;\" onmousedown=\"toggleCat('cat')\"><div id=\"plus\" class=\"rightButton\" style=\"display: block; \">Expand</div></a>";
 	}
 }
+topBar(getForumName($_GET['forumid'], $index), array(
+	array("left", "?action=frontpage", "Home"),
+	array("left", "?action=popular", "Popular"),
+	array("left", "?action=read", "Read"),
+	array("right", ($returnid == 0 ? "?action=frontpage" : "?action=forum&forumid=".$returnid), "Back")));
 
-echo linkStuff("<div class=\"leftButton\">Read</div>",'?action=read');
-echo "</div>".tagStuff(tagStuff(getForumName($_GET['forumid'], $index),"center"),"h1");
 
 if (ISSET($subforums)) {
 	if (!ISSET($_COOKIE[$_GET['forumid']])) {

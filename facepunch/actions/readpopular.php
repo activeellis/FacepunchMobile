@@ -6,7 +6,10 @@ forumHeader();
 
 $threads = ($action == "read" ? $api->getReadThreads() : $api->getPopularThreads());
 
-echo "<div id=\"forumWrapper\"><div id=\"forumHeader\">".linkStuff("<div class=\"leftButton\">Home</div></div>",'./?action=frontpage').tagStuff(tagStuff(($action == "read" ? 'Read' : 'Popular'),"center"),"h1")."</div>";
+topBar($action == "read" ? 'Read' : 'Popular', array(
+		array("left", "?action=frontpage", "Home"),
+		array("right", "?action=settings", "Settings")));
+
 if (!EMPTY($threads['threads'])) {
 	echo "<div id=\"content\">";
 	foreach ($threads['threads'] as $a) {
