@@ -29,7 +29,7 @@ foreach ($array['posts'] as $thread) {
 	}
 	$wut = 1;
 	$datetext = $thread["time"];
-	echo "<div class=\"".(!$oddeven ? "oddpost" : "evenpost")."\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/avatar/".$thread["userid"].".png);\"").">".$thread['username']."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($thread['usertitle'])?optimizeUserTitleSize($thread['usertitle']):'')."</div></h4><h5>";
+	echo "<div class=\"".(!$oddeven ? "oddpost" : "evenpost")."\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/avatar/".$thread["userid"].".png);\"").">".$thread['username_html']."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($thread['usertitle'])?optimizeUserTitleSize($thread['usertitle']):'')."</div></h4><h5>";
 	$oddeven = !$oddeven;
 	$bbcode = new BBCode;
 	if (ISSET($_COOKIE['images'])) {

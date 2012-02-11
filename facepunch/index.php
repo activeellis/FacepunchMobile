@@ -14,7 +14,8 @@ $actions = array(
 	"thread" => "thread.php",
 	"read" => "readpopular.php",
 	"popular" => "readpopular.php",
-	"settings" => "settings.php");
+	"settings" => "settings.php",
+	"reply" => "reply.php");
 
 if (!isset($actions[$action]))
 	$action = "frontpage";

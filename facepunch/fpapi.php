@@ -31,6 +31,18 @@ class FPApi {
 		curl_close($ch);
 		return json_decode($result,true);
 	}
+	
+	function sendArrayPost($arguments, $postarguments, $num) {
+		$arguments .= "&username=".$this->username."&password=".$this->password;
+		$ch = curl_init();
+		curl_setopt($ch,CURLOPT_URL,'http://api.facepun.ch/?'.$arguments);
+		curl_setopt($ch,CURLOPT_POST,$num);
+		curl_setopt($ch,CURLOPT_POSTFIELDS,$postarguments);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		return json_decode($result,true);
+	}
 
 	function authenticate($username, $password) {
 		$result = $this->requestArrayNoAuth("action=authenticate&username=".$username."&password=".$password);
@@ -73,7 +85,7 @@ class FPApi {
 	}
 	
 	function postReply($threadid, $message) {
-		return $this->requestArray("action=newreply&thread_id=".$threadid."&message=".$message);
+		return $this->sendArrayPost("action=newreply", "thread_id=".$threadid."&message=".$message, 2);
 	}
 }
 
