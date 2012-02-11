@@ -67,8 +67,10 @@ if (!EMPTY($pagecode)) {
 }
 echo $pagecode;
 echo '<br /><form id="reply" action="./?action=reply" method="post" accept-charset="UTF-8">
-<input type="hidden" name="threadid" value="'.$_GET['threadid'].'"></input>
-<input type="hidden" name="page" value="'.(ISSET($_GET['page']) ? $_GET['page'] : 1).'"></input>
+<input type="hidden" name="threadid" value="'.$_GET['threadid'].'"></input>';
+if (isset($_GET['forumid']))
+	echo '<input type="hidden" name="threadid" value="'.$_GET['forumid'].'"></input>';
+echo '<input type="hidden" name="page" value="'.(ISSET($_GET['page']) ? $_GET['page'] : 1).'"></input>
 <textarea type="text" name="message" size="10" required></textarea>
 <input type="submit" value="Reply" name="reply" class="reply" />
 </form></div>';
