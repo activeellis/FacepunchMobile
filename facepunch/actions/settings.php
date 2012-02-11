@@ -1,4 +1,6 @@
 <?php
+if (!defined('fp'))
+	return;
 
 forumHeader();
 

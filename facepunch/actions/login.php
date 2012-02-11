@@ -1,4 +1,6 @@
 <?php
+if (!defined('fp'))
+	return;
 
 if (!isset($_POST['username'])) {
 	forumHeader();

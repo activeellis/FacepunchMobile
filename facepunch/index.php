@@ -1,5 +1,6 @@
 <?php
 
+define('fp', 1);
 require("theme.php");
 require('fpapi.php');
 
