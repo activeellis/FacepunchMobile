@@ -6,12 +6,7 @@ require_once('nbbc.php');
 forumHeader();
 
 $array = $api->getPosts($_GET['threadid'], isset($_GET['page']) ? $_GET['page'] : 1);
-
-$returnid = isset($_GET['forumid']) ? $_GET['forumid'] : 0; //todo: add this to GET request so.
-if ($returnid == 56) {
-	echo 'what you are doing is highly illegal';
-	break;
-}
+$returnid = isset($_GET['forumid']) ? $_GET['forumid'] : 0;
 
 topBar($array['title'], array(
 		array("left", "?action=frontpage", "Home"),

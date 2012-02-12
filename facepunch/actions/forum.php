@@ -6,10 +6,9 @@ forumHeader();
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $index = $api->getForums();
-$result = $api->getThreads($_GET['forumid'], $page);
+$arrayforum = $api->getThreads($_GET['forumid'], $page);
 $subforums = getSubForums($_GET['forumid'], $index);
-$arrayforum = $result[0];
-$pages = $result[1];
+$pages = $arrayforum['numpages'];
 
 echo "<div id=\"forumWrapper\">";
 $returnid = getParent($_GET["forumid"],$index,0);

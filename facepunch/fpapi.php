@@ -60,8 +60,7 @@ class FPApi {
 	}
 	
 	function getThreads($forumid, $page) {
-		$result = $this->requestArray("action=getthreads&forum_id=".$forumid."&page=".$page);
-		return array($result, $result['numpages']);
+		return $this->requestArray("action=getthreads&forum_id=".$forumid."&page=".$page);
 	}
 	
 	function getReadThreads() {
@@ -73,7 +72,10 @@ class FPApi {
 	}
 	
 	function getPosts($threadid, $page) {
-		return $this->requestArray("action=getposts&thread_id=".$threadid."&page=".$page);
+		if ($page == -1) //get new posts
+			return $this->requestArray("action=getnewposts&thread_id=".$threadid);
+		else
+			return $this->requestArray("action=getposts&thread_id=".$threadid."&page=".$page);
 	}
 	
 	function getPMs($page) {
@@ -84,8 +86,40 @@ class FPApi {
 		return $this->requestArray("action=getpm&pm_id=".$pmid);
 	}
 	
+	function sendPM($recipients, $subject, $body, $icon) {
+		return $this->sendArrayPost("action=newreply", "recipients=".$recipients."&subject=".$subject."&body=".$body."&icon=".$icon, 4);
+	}
+	
+	function newThread($forumid, $subject, $body, $icon) {
+		return $this->sendArrayPost("action=newreply", "forum_id=".$forumid."&subject=".$subject."&body=".$body."&icon=".$icon, 4);
+	}
+	
+	function getQuote($postid) {
+		return $this->requestArray("action=getquote&post_id=".$pmid);
+	}
+	
 	function postReply($threadid, $message) {
 		return $this->sendArrayPost("action=newreply", "thread_id=".$threadid."&message=".$message, 2);
+	}
+	
+	function getEdit($postid) {
+		return $this->requestArray("action=getedit&post_id=".$pmid);
+	}
+	
+	function doEdit($postid, $message) {
+		return $this->sendArrayPost("action=doedit", "post_id=".$postid."&message=".$message, 2);
+	}
+	
+	function rate($postid, $rating, $key) {
+		return $this->requestArray("action=rate&post_id=".$postid."&rating=".$rating."&key=".$key);
+	}
+	
+	function getThreadIcons($forumid) {
+		return $this->requestArray("action=getthreadicons&forum_id=".$forumid);
+	}
+	
+	function getPMIcons() {
+		return $this->requestArray("action=getpmicons");
 	}
 }
 
