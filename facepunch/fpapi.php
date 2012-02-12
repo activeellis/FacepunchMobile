@@ -95,7 +95,7 @@ class FPApi {
 	}
 	
 	function getQuote($postid) {
-		return $this->requestArray("action=getquote&post_id=".$pmid);
+		return $this->requestArray("action=getquote&post_id=".$postid);
 	}
 	
 	function postReply($threadid, $message) {
@@ -103,7 +103,7 @@ class FPApi {
 	}
 	
 	function getEdit($postid) {
-		return $this->requestArray("action=getedit&post_id=".$pmid);
+		return $this->requestArray("action=getedit&post_id=".$postid);
 	}
 	
 	function doEdit($postid, $message) {
