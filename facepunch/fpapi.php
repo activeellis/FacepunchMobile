@@ -41,7 +41,6 @@ class FPApi {
 		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 		$result = curl_exec($ch);
 		curl_close($ch);
-		echo $result;
 		return json_decode($result,true);
 	}
 
@@ -108,7 +107,7 @@ class FPApi {
 	}
 	
 	function doEdit($postid, $message) {
-		return $this->sendArrayPost("action=doedit&debug=true", "post_id=".$postid."&message=".$message, 2);
+		return $this->sendArrayPost("action=doedit", "post_id=".$postid."&message=".$message, 2);
 	}
 	
 	function rate($postid, $rating, $key) {

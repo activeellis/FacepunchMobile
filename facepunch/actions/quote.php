@@ -52,7 +52,7 @@ if (isset($_GET['postid'])) {
 		<center>
 		Edited post successfully!<br />
 		Returning to thread in 3 seconds.
-		<!--<meta http-equiv="refresh" content="3; URL=./?action=thread&threadid=<?=$threadid?>&page=<?=$page?><?php echo isset($_POST['forumid']) ? "&forumid=".$_POST['forumid'] : ''; ?>">-->
+		<meta http-equiv="refresh" content="3; URL=./?action=thread&threadid=<?=$threadid?>&page=<?=$page?><?php echo isset($_POST['forumid']) ? "&forumid=".$_POST['forumid'] : ''; ?>">
 		</center>
 		<?php
 	}
