@@ -5,7 +5,8 @@ if (!defined('fp'))
 require_once('nbbc.php');
 forumHeader();
 
-$array = $api->getPosts($_GET['threadid'], isset($_GET['page']) ? $_GET['page'] : 1);
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$array = $api->getPosts($_GET['threadid'], $page);
 $returnid = isset($_GET['forumid']) ? $_GET['forumid'] : 0;
 
 topBar($array['title'], array(
@@ -17,18 +18,20 @@ $pagecode = getThreadPageCode($array['numpages']);
 echo $pagecode;
 $oddeven = false;
 $wut= 0;
-foreach ($array['posts'] as $thread) {
+foreach ($array['posts'] as $post) {
 	if(!EMPTY($pagecode) || $wut == 1) {
 		echo '<div id="er"></div>';
 	}
 	$wut = 1;
-	$datetext = $thread["time"];
-	echo "<div class=\"".(!$oddeven ? "oddpost" : "evenpost")."\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/avatar/".$thread["userid"].".png);\"").">".$thread['username_html']."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($thread['usertitle'])?optimizeUserTitleSize($thread['usertitle']):'')."</div></h4><h5>";
+	$datetext = $post["time"];
+	echo "<div class=\"".(!$oddeven ? "oddpost" : "evenpost")."\"><h4 ".(ISSET($_COOKIE['avatars'])?'style="padding-left:0px;"':"style=\"-webkit-background-size:40px auto;-o-background-size:40px auto;-moz-background-size:40px auto;background-size:40px auto;background-position:0px center;background-repeat:no-repeat;background-image:url(http://www.facepunch.com/avatar/".$post["userid"].".png);\"").">".$post['username_html']."<div style=\"float:right;\">".$datetext."</div><div id=\"userTitle\">".(!EMPTY($post['usertitle'])?optimizeUserTitleSize($post['usertitle']):'')."</div></h4><h5>";
 	$oddeven = !$oddeven;
 	$bbcode = new BBCode;
 	if (ISSET($_COOKIE['images'])) {
 		$bbcode->RemoveRule('img');
 		$bbcode->RemoveRule('thumb');
+		$bbcode->RemoveRule('div');
+		$bbcode->RemoveRule('quote');
 		$newrule= Array(
 			'mode' => BBCODE_MODE_LIBRARY,
 			'method' => 'DoImageURL',
@@ -43,13 +46,18 @@ foreach ($array['posts'] as $thread) {
 		$bbcode->AddRule('img', $newrule);
 		$bbcode->AddRule('thumb', $newrule);
 	}
-	$input = $thread['message'];
+	$input = $post['message'];
 	$output = $bbcode->Parse($input);
 	echo html_entity_decode($output);
-	echo "</h5>";
-	if (ISSET($thread['ratings']) && !ISSET($_COOKIE['ratings'])) {
+	echo '<div align="right" style="font-weight: bold"><a href="?action=quote&postid='.$post['id'].'&threadid='.$_GET['threadid'].'&page='.$page.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">Quote</a>';
+	if (strcasecmp($post['username'], $api->username) == 0) {
+		//we can edit this post.
+		echo ' | <a href="?action=edit&postid='.$post['id'].'&threadid='.$_GET['threadid'].'&page='.$page.(isset($_GET['forumid']) ? '&forumid='.$_GET['forumid'] : '').'">Edit</a>';
+	}
+	echo "</div><br /></h5>";
+	if (ISSET($post['ratings']) && !ISSET($_COOKIE['ratings'])) {
 		echo "<div id=\"ratingWrapper\"><div id=\"ratings\">";
-		foreach ($thread['ratings'] as $r => $b) {
+		foreach ($post['ratings'] as $r => $b) {
 			echo "<img src=\"./ratings/".$r.".png\" />x".$b;
 		}
 		echo "</div></div>";
@@ -63,7 +71,7 @@ echo $pagecode;
 echo '<br /><form id="reply" action="./?action=reply" method="post" accept-charset="UTF-8">
 <input type="hidden" name="threadid" value="'.$_GET['threadid'].'"></input>';
 if (isset($_GET['forumid']))
-	echo '<input type="hidden" name="threadid" value="'.$_GET['forumid'].'"></input>';
+	echo '<input type="hidden" name="forumid" value="'.$_GET['forumid'].'"></input>';
 echo '<input type="hidden" name="page" value="'.(ISSET($_GET['page']) ? $_GET['page'] : 1).'"></input>
 <textarea type="text" name="message" size="10" required></textarea>
 <input type="submit" value="Reply" name="reply" class="reply" />

@@ -50,8 +50,12 @@ if (!EMPTY($arrayforum['threads'])) {
 	foreach ($arrayforum['threads'] as $a) {
 		echo "<div id=\"thread\">
 		<a href =\"?action=thread&threadid=".$a['id']."&forumid=".$_GET['forumid']."\">
-		<div id=\"title\">
-		<h2>".($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'')."</h2>";
+		<div id=\"title\">";
+		if ($a['status'] == 'new')
+			echo '<h2>';
+		echo ($a['locked']=='true'?'<font color="grey">':'').$a['title'].($a['locked']=='true'?'</font>':'');
+		if ($a['status'] == 'new')
+			echo '</h2>';
 		echo "</div>
 		</a>";
 		if ($a['pages'] > 1) {

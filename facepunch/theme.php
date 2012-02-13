@@ -276,6 +276,9 @@ a, a:link, a:visited, a:active, a:hover {
 .bbcode_quote_body img {
 	max-width: 25%;
 }
+.quote{	-moz-border-radius: 2px;
+	border-radius: 2px;margin:10px;border:1px solid #888;display:table;}.quote .message,.quote .information{background-color:#bdf;padding:10px;font-size:11px;}
+.quote .information{padding:4px;font-size:10px;background-color:#ace;}
 .bbcode_code, .cpp, .csharp, .html, .php {
     word-wrap: break-word;
     width: 100%;

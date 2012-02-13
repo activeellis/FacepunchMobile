@@ -17,7 +17,7 @@ if (isset($_POST['message']) && isset($_POST['threadid'])) {
 	<center>
 	Posted reply successfully!<br />
 	Returning to thread in 3 seconds.
-	<meta http-equiv="refresh" content="3; URL=./?action=thread&threadid=<?=$threadid?>&page=<?=$_POST['page']?>&forumid=<?=$_POST['forumid']?>">
+	<meta http-equiv="refresh" content="3; URL=./?action=thread&threadid=<?=$threadid?>&page=<?=$_POST['page']?><?php echo isset($_POST['forumid']) ? "&forumid=".$_POST['forumid'] : ''; ?>">
 	</center>
 	<?php
 } else {

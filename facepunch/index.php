@@ -17,7 +17,9 @@ $actions = array(
 	"settings" => "settings.php",
 	"reply" => "reply.php",
 	"privatemessages" => "privatemessaging.php",
-	"viewpm" => "privatemessaging.php");
+	"viewpm" => "privatemessaging.php",
+	"quote" => "quote.php",
+	"edit" => "quote.php");
 
 if (!isset($actions[$action]))
 	$action = "frontpage";
